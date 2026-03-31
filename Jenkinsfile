@@ -1,22 +1,84 @@
 pipeline {
-    agent any 
+    agent any
+
+    environment {
+        HARBOR_URL    = 'amdp-registry.skala-ai.com'
+        PROJECT_NAME  = 'skala25a'
+        IMAGE_NAME    = 'sk052-devops-app'
+        IMAGE_TAG     = "${BUILD_NUMBER}"
+    }
 
     stages {
-        stage('build') {
+
+        stage('Checkout') {
             steps {
-                echo 'building the application...'
+                echo '===== [1/4] GitHub 소스코드 체크아웃 ====='
+                checkout scm
             }
         }
-        stage('test') {
+
+        stage('Code Build') {
             steps {
-                echo 'testing the application...'
+                echo '===== [2/4] 코드 빌드 (의존성 설치) ====='
+                sh '''
+                    pip install --no-cache-dir -r requirements.txt
+                    echo "Build complete: $(pip show flask | grep Version)"
+                '''
             }
         }
-        stage('deploy') {
+
+        stage('Image Build') {
             steps {
-                echo 'deploying the application...'
+                echo '===== [3/4] Docker 이미지 빌드 ====='
+                sh '''
+                    docker build \
+                        -t ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:${IMAGE_TAG} \
+                        -t ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:latest \
+                        .
+                    echo "Image built: ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+                '''
+            }
+        }
+
+        stage('Push to Harbor') {
+            steps {
+                echo '===== [4/4] Harbor Registry 에 이미지 등록 ====='
+                withCredentials([usernamePassword(
+                    credentialsId: 'harbor-credentials',
+                    usernameVariable: 'HARBOR_USER',
+                    passwordVariable: 'HARBOR_PASS'
+                )]) {
+                    sh '''
+                        echo "Harbor 로그인 중..."
+                        docker login ${HARBOR_URL} \
+                            -u ${HARBOR_USER} \
+                            -p ${HARBOR_PASS}
+
+                        echo "이미지 푸시 중..."
+                        docker push ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:${IMAGE_TAG}
+                        docker push ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:latest
+
+                        echo "Harbor 푸시 완료!"
+                        docker logout ${HARBOR_URL}
+                    '''
+                }
             }
         }
     }
-}
 
+    post {
+        success {
+            echo """
+            ✅ Pipeline 성공!
+            - Image: ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:${IMAGE_TAG}
+            - Build: #${BUILD_NUMBER}
+            """
+        }
+        failure {
+            echo '❌ Pipeline 실패. 로그를 확인하세요.'
+        }
+        always {
+            echo 'Pipeline 종료.'
+        }
+    }
+}
