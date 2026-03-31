@@ -2,10 +2,9 @@ pipeline {
     agent any
 
     environment {
-        HARBOR_URL    = 'amdp-registry.skala-ai.com/skala26a-ai2'
-        PROJECT_NAME  = 'skala26a-ai2'
-        IMAGE_NAME    = 'sk052-devops-app'
-        IMAGE_TAG     = "${BUILD_NUMBER}"
+        HARBOR_URL = 'amdp-registry.skala-ai.com/skala26a-ai2'
+        IMAGE_NAME = 'sk052-devops-app'
+        IMAGE_TAG  = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -16,32 +15,29 @@ pipeline {
                 checkout scm
             }
         }
-	
-
-
 
         stage('Code Build') {
-		steps {
-        		echo '===== [2/4] 코드 빌드 확인 ====='
-        		sh '''
-            			echo "=== 소스 파일 목록 ==="
-            			ls -la
-            			echo "=== requirements.txt 내용 ==="
-            			cat requirements.txt
-        			'''
-    			}
-	}
+            steps {
+                echo '===== [2/4] 코드 빌드 확인 ====='
+                sh '''
+                    echo "=== 소스 파일 목록 ==="
+                    ls -la
+                    echo "=== requirements.txt 내용 ==="
+                    cat requirements.txt
+                '''
+            }
+        }
 
         stage('Image Build') {
             steps {
                 echo '===== [3/4] Docker 이미지 빌드 ====='
-                sh '''
+                sh """
                     docker build \
-                        -t ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:${IMAGE_TAG} \
-                        -t ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:latest \
+                        -t ${HARBOR_URL}/${IMAGE_NAME}:${IMAGE_TAG} \
+                        -t ${HARBOR_URL}/${IMAGE_NAME}:latest \
                         .
-                    echo "Image built: ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:${IMAGE_TAG}"
-                '''
+                    echo "이미지 빌드 완료: ${HARBOR_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
+                """
             }
         }
 
@@ -53,19 +49,19 @@ pipeline {
                     usernameVariable: 'HARBOR_USER',
                     passwordVariable: 'HARBOR_PASS'
                 )]) {
-                    sh '''
+                    sh """
                         echo "Harbor 로그인 중..."
-                        docker login ${HARBOR_URL} \
+                        docker login amdp-registry.skala-ai.com \
                             -u ${HARBOR_USER} \
                             -p ${HARBOR_PASS}
 
                         echo "이미지 푸시 중..."
-                        docker push ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:${IMAGE_TAG}
-                        docker push ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:latest
+                        docker push ${HARBOR_URL}/${IMAGE_NAME}:${IMAGE_TAG}
+                        docker push ${HARBOR_URL}/${IMAGE_NAME}:latest
 
                         echo "Harbor 푸시 완료!"
-                        docker logout ${HARBOR_URL}
-                    '''
+                        docker logout amdp-registry.skala-ai.com
+                    """
                 }
             }
         }
@@ -75,7 +71,7 @@ pipeline {
         success {
             echo """
             ✅ Pipeline 성공!
-            - Image: ${HARBOR_URL}/${PROJECT_NAME}/${IMAGE_NAME}:${IMAGE_TAG}
+            - Image: ${HARBOR_URL}/${IMAGE_NAME}:${IMAGE_TAG}
             - Build: #${BUILD_NUMBER}
             """
         }
@@ -87,3 +83,4 @@ pipeline {
         }
     }
 }
+
