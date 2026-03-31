@@ -49,7 +49,7 @@ pipeline {
                     usernameVariable: 'HARBOR_USER',
                     passwordVariable: 'HARBOR_PASS'
                 )]) {
-                    sh """
+                    sh '''
                         echo "Harbor 로그인 중..."
                         docker login amdp-registry.skala-ai.com \
                             -u ${HARBOR_USER} \
@@ -61,7 +61,7 @@ pipeline {
 
                         echo "Harbor 푸시 완료!"
                         docker logout amdp-registry.skala-ai.com
-                    """
+                    '''
                 }
             }
         }
