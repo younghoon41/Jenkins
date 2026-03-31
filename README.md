@@ -30,6 +30,6 @@ GitHub Push → Jenkins Checkout → Code Build → Image Build → Harbor Push
 ## Harbor 이미지
 
 ```
-amdp-registry.skala-ai.com/skala25a/sk052-devops-app:<BUILD_NUMBER>
-amdp-registry.skala-ai.com/skala25a/sk052-devops-app:latest
+amdp-registry.skala-ai.com/skala26a-ai2/sk052-devops-app:<BUILD_NUMBER>
+amdp-registry.skala-ai.com/skala26a-ai2/sk052-devops-app:latest
 ```

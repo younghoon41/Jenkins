@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        HARBOR_URL    = 'amdp-registry.skala-ai.com'
-        PROJECT_NAME  = 'skala25a'
+        HARBOR_URL    = 'amdp-registry.skala-ai.com/skala26a-ai2'
+        PROJECT_NAME  = 'skala26a-ai2'
         IMAGE_NAME    = 'sk052-devops-app'
         IMAGE_TAG     = "${BUILD_NUMBER}"
     }
