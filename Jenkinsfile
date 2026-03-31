@@ -16,16 +16,21 @@ pipeline {
                 checkout scm
             }
         }
+	
+
+
 
         stage('Code Build') {
-            steps {
-                echo '===== [2/4] 코드 빌드 (의존성 설치) ====='
-                sh '''
-                    pip install --no-cache-dir -r requirements.txt
-                    echo "Build complete: $(pip show flask | grep Version)"
-                '''
-            }
-        }
+		steps {
+        		echo '===== [2/4] 코드 빌드 확인 ====='
+        		sh '''
+            			echo "=== 소스 파일 목록 ==="
+            			ls -la
+            			echo "=== requirements.txt 내용 ==="
+            			cat requirements.txt
+        			'''
+    			}
+	}
 
         stage('Image Build') {
             steps {
