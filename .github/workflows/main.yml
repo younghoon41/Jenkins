@@ -1,0 +1,15 @@
+name: Skala-CI-Test
+on: [push] # 코드를 push하면 바로 실행!
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4 # 코드를 가져오는 Action
+
+      - name: Check Environment
+        run: |
+          echo "Hello 영훈님! 현재 서버의 환경입니다."
+          python --version
+          docker --version
