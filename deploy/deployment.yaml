@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sk052-devops-app
+  namespace: class-2
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sk052-app
+  template:
+    metadata:
+      labels:
+        app: sk052-app
+    spec:
+      containers:
+      - name: app
+        image: __IMAGE__  # Jenkins가 이 부분을 실제 이미지 주소로 바꿀 겁니다
+        ports:
+        - containerPort: 8080
