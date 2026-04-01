@@ -1,0 +1,43 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: yh-ci-pipeline
+  namespace: class-2
+spec:
+  params:
+    - name: repo-url
+      type: string
+    - name: image-url
+      type: string
+  workspaces:
+    - name: shared-data
+  tasks:
+    - name: clone
+      taskRef:
+        name: git-clone # 아까 설치한 Task
+      params:
+        - name: url
+          value: $(params.repo-url)
+      workspaces:
+        - name: output
+          workspace: shared-data
+
+    - name: test
+      runAfter: [clone]
+      taskRef:
+        name: demo-read-task # 아까 만든 읽기 테스트 Task 재활용
+      workspaces:
+        - name: shared-data
+          workspace: shared-data
+
+    - name: build
+      runAfter: [test]
+      taskRef:
+        name: kaniko # 아까 설치한 kaniko Task
+      params:
+        - name: IMAGE
+          value: $(params.image-url)
+      workspaces:
+        - name: source
+          workspace: shared-data
+

@@ -2,21 +2,30 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sk052-devops-app
-  namespace: class-2
+  namespace: skala3-ai2
+  labels:
+    app: sk052-devops-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: sk052-app
+      app: sk052-devops-app
   template:
     metadata:
       labels:
-        app: sk052-app
+        app: sk052-devops-app
     spec:
-      containers:
-      - name: app
-        image: __IMAGE__  # Jenkins가 이 부분을 실제 이미지 주소로 바꿀 겁니다
-        ports:
-        - containerPort: 8080
       imagePullSecrets:
-      - name: harbor-pull-secret
+        - name: harbor-secret
+      containers:
+        - name: sk052-devops-app
+          image: __IMAGE__
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

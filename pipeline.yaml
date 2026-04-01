@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: yh-sample-pipeline
+  namespace: class-2
+spec:
+  params:
+    - name: app-name
+      type: string
+  tasks:
+    - name: build
+      taskRef:
+        name: yh-build-task
+      params:
+        - name: app-name
+          value: $(params.app-name)
+    - name: test
+      runAfter:
+        - build
+      taskRef:
+        name: yh-test-task
+      params:
+        - name: app-name
+          value: $(params.app-name)
+

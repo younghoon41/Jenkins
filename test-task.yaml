@@ -1,0 +1,39 @@
+# apiVersion: tekton.dev/v1
+# kind: Task
+# metadata:
+#   name: yh-test-task
+#   namespace: class-2
+# spec:
+#   params:
+#     - name: app-name
+#       type: string
+#   steps:
+#     - name: test
+#       image: alpine:3.20
+#       script: |
+#         #!/bin/sh
+#         echo "Testing $(params.app-name)"
+
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: demo-read-task
+  namespace: class-2
+spec:
+  workspaces:
+    - name: shared-data
+  steps:
+    - name: read-file
+      image: alpine:3.20
+      script: |
+        #!/bin/sh
+        echo "Creating a temporary Dockerfile for Kaniko test..."
+        cat <<EOF > $(workspaces.shared-data.path)/Dockerfile
+        FROM alpine:3.20
+        RUN echo "Hello from built image" > /hello.txt
+        ENTRYPOINT ["cat", "/hello.txt"]
+        EOF
+        echo "Dockerfile created at $(workspaces.shared-data.path)/Dockerfile"
+        ls -l $(workspaces.shared-data.path)/Dockerfile
+
+

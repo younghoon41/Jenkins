@@ -1,0 +1,48 @@
+# 1. Hello Task
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: demo-hello-task
+  namespace: class-2
+spec:
+  steps:
+    - name: print-message
+      image: alpine:3.20
+      script: |
+        #!/bin/sh
+        echo "Hello from Tekton!"
+---
+# 2. Write Task
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: demo-write-task
+  namespace: class-2
+spec:
+  workspaces:
+    - name: shared-data
+  steps:
+    - name: write-file
+      image: alpine:3.20
+      script: |
+        #!/bin/sh
+        echo "Tekton Pipeline Test Success" > $(workspaces.shared-data.path)/message.txt
+        echo "File created in $(workspaces.shared-data.path)"
+---
+# 3. Read Task
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: demo-read-task
+  namespace: class-2
+spec:
+  workspaces:
+    - name: shared-data
+  steps:
+    - name: read-file
+      image: alpine:3.20
+      script: |
+        #!/bin/sh
+        echo "Reading file..."
+        cat $(workspaces.shared-data.path)/message.txt
+

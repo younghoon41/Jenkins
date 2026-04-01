@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  generateName: yh-ci-run-
+  namespace: class-2
+spec:
+  pipelineRef:
+    name: yh-ci-pipeline
+  taskRunSpecs:
+    - pipelineTaskName: clone
+      podTemplate:
+        securityContext:
+          fsGroup: 65532
+    - pipelineTaskName: build
+      podTemplate:
+        securityContext:
+          fsGroup: 65532
+  params:
+    - name: repo-url
+      value: "https://github.com/tektoncd/pipeline.git"
+    - name: image-url
+      value: "docker.io/younghoon/test-image:latest"
+  workspaces:
+    - name: shared-data
+      persistentVolumeClaim:
+        claimName: sk052-1-pvc
+

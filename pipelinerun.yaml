@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: yh-sample-pipeline-run
+  namespace: class-2
+spec:
+  pipelineRef:
+    name: yh-sample-pipeline
+  params:
+    - name: app-name
+      value: my-app
+

@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: demo-pipeline-run
+  namespace: class-2
+spec:
+  pipelineRef:
+    name: demo-simple-pipeline
+  # 권한 문제 해결을 위한 템플릿 (아까 학습한 내용!)
+  taskRunSpecs:
+    - pipelineTaskName: step-write-file
+      podTemplate:
+        securityContext:
+          fsGroup: 65532
+    - pipelineTaskName: step-read-file
+      podTemplate:
+        securityContext:
+          fsGroup: 65532
+  workspaces:
+    - name: shared-workspace
+      persistentVolumeClaim:
+        claimName: sk052-1-pvc # 기존에 만든 PVC 재사용
+
