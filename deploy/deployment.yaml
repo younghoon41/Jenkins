@@ -18,3 +18,5 @@ spec:
         image: __IMAGE__  # Jenkins가 이 부분을 실제 이미지 주소로 바꿀 겁니다
         ports:
         - containerPort: 8080
+      imagePullSecrets:
+      - name: harbor-pull-secret
